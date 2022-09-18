@@ -1,0 +1,97 @@
+version: "3"
+
+x-common:
+  &common
+  image: apache/airflow:2.3.0
+  user: "${AIRFLOW_UID}:0"
+  env_file:
+    - .env
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - /var/run/docker.sock:/var/run/docker.sock
+
+x-depends-on:
+  &depends-on
+  depends_on:
+    airflow-init:
+      condition: service_completed_successfully
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
+    env_file:
+      - .env
+
+  scheduler:
+    <<: [*common, *depends-on]
+    container_name: airflow-scheduler
+    command: scheduler
+    restart: on-failure
+    ports:
+      - "4001:8793"
+
+  webserver:
+    <<: [*common, *depends-on]
+    container_name: airflow-webserver
+    restart: always
+    command: webserver
+    ports:
+      - "4002:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http:localhost:8080/health"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+
+  airflow-init:
+    <<: *common
+    container_name: airflow-init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p /sources/logs /sources/dags /sources/plugins
+        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        exec /entrypoint airflow version
+
+  minio:
+    hostname: minio
+    container_name: minio_container
+    image: 'bitnami/minio'
+    environment:
+      MINIO_ROOT_USER: minio_admin
+      MINIO_ROOT_PASSWORD: minio_password
+    ports:
+      - '4003:9000'
+      - '4004:9001'
+    volumes:
+      - './data:/data'
+    networks:
+      - datalake
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://minio:9000/minio/health/live']
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+secrets:
+  access_key:
+    external: true
+  secret_key:
+    external: true
+
+volumes:
+  airflow-data:
+
+networks:
+  datalake:
+    driver: bridge
