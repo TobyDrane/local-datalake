@@ -40,6 +40,7 @@ endif
 setup:
 	docker compose -f setup-compose.yml up --detach
 
+	# Create the default buckets (raw, processed and enriched)
 	mc config host add minio http://localhost:4003 minio_admin minio_password
 	mc mb --ignore-existing minio/raw-data
 	mc mb --ignore-existing minio/processed-data
@@ -47,3 +48,17 @@ setup:
 
 teardown:
 	docker swarm leave --force
+
+	# Stop all running docker containers
+	docker stop airflow-webserver
+	docker stop airflow-scheduler
+	docker stop airflow-init
+	docker stop postgres
+	docker stop minio_container
+	
+	# Remove the images from the system
+	docker rm airflow-webserver
+	docker rm airflow-scheduler
+	docker rm airflow-init
+	docker rm postgres
+	docker rm minio_container
