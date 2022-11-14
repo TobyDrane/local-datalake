@@ -60,13 +60,20 @@ class DataSystem:
         except (Exception):
             raise InvalidObjectResponse
 
-    def put_object(self, bucket_name: str, object_name: str, df: DataFrame) -> str:
+    def put_object(
+        self, bucket_name: str, object_name: str, df: DataFrame, index=False
+    ) -> str:
         """
         Uploads a dataframe object to the Minio storage.
 
         Returns a string of the new object_name
         """
-        csv_buffer = StringIO()
-        df.to_csv(csv_buffer, index=False)
-        res = self.client.put_object(bucket_name, object_name, csv_buffer)
+        csv = df.to_csv(index=index).encode("utf-8")
+        res = self.client.put_object(
+            bucket_name,
+            object_name,
+            data=BytesIO(csv),
+            length=len(csv),
+            content_type="application/csv",
+        )
         return res.object_name

@@ -38,7 +38,7 @@ else
 endif
 
 setup:
-	docker compose -f setup-compose.yml up --detach
+	docker compose -f setup-compose.yml up --build --detach
 
 	# Create the default buckets (raw, processed and enriched)
 	mc config host add minio http://localhost:4003 minio_admin minio_password
