@@ -2,7 +2,8 @@ version: "3"
 
 x-common:
   &common
-  image: apache/airflow:2.3.0
+  build: .
+  # image: apache/airflow:2.3.0
   user: "${AIRFLOW_UID}:0"
   env_file:
     - .env
@@ -10,7 +11,10 @@ x-common:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
+    - ./utils:/opt/airflow/utils
     - /var/run/docker.sock:/var/run/docker.sock
+  networks:
+    - datalake
 
 x-depends-on:
   &depends-on
@@ -30,6 +34,8 @@ services:
       retries: 5
     env_file:
       - .env
+    networks:
+      - datalake
 
   scheduler:
     <<: [*common, *depends-on]

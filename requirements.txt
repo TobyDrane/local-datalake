@@ -1,1 +1,4 @@
 apache-airflow==2.3.4
+minio==7.1.11
+pandas
+yfinance==0.1.85
