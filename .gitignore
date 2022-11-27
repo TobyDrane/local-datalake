@@ -36,12 +36,6 @@ ENV/
 .pyre/
 
 # Created directories
-dags/*
-!dags/sample_dag.py
-!dags/__init__.py
-!dags/stocks/functions.py
-!dags/stocks/stocks_example.py
-
 data/
 logs/
 plugins/
