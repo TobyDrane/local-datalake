@@ -6,6 +6,10 @@ from airflow.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup
 
 from stocks.functions import fetch_price_data
+from dotenv import dotenv_values
+
+ENV = dotenv_values(".env")
+print("ENV", ENV)
 
 #
 # DAG default arguments

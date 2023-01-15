@@ -26,18 +26,8 @@ venv:
 	@echo " \033[0;32msource .venv/bin/activate"
 
 # Perform base setup
-pre-setup:
-ifeq ($(minio_access_key), )
-	@echo "\033[0;31m--- You have not replaced the minio access key value."
-else ifeq ($(minio_secret_key), )
-	@echo "\033[0;31m--- You have not replaced the minio secret access key value."
-else
-	docker swarm init
-	printf "$(minio_access_key)" | docker secret create access_key -
-	printf "$(minio_secret_key)" | docker secret create secret_key -
-endif
-
 setup:
+	docker swarm init
 	docker compose -f setup-compose.yml up --build --detach
 
 	# Create the default buckets (raw, processed and enriched)
