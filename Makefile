@@ -39,3 +39,17 @@ setup/buckets:
 
 teardown:
 	docker swarm leave --force
+
+	# Stop all running docker containers
+	docker stop airflow-webserver
+	docker stop airflow-scheduler
+	docker stop airflow-init
+	docker stop postgres
+	docker stop minio_container
+	
+	# Remove the images from the system
+	docker rm airflow-webserver
+	docker rm airflow-scheduler
+	docker rm airflow-init
+	docker rm postgres
+	docker rm minio_container

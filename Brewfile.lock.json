@@ -50,18 +50,17 @@
           }
         }
       },
-      "minio/stable/mc": {
-      }
+      "minio/stable/mc": {}
     }
   },
   "system": {
     "macos": {
       "monterey": {
-        "HOMEBREW_VERSION": "3.6.1",
+        "HOMEBREW_VERSION": "3.6.9",
         "HOMEBREW_PREFIX": "/opt/homebrew",
-        "Homebrew/homebrew-core": "5a3ce81ab050693f521012470f9dfe39047edc5a",
+        "Homebrew/homebrew-core": "27e02175022bac286230391ca932b372fec6c3d7",
         "CLT": "13.4.0.0.1.1651278267",
-        "Xcode": "13.4",
+        "Xcode": "13.4.1",
         "macOS": "12.5.1"
       },
       "big_sur": {
