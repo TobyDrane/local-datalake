@@ -15,6 +15,7 @@ python-setup: brew pre-commit-setup
 # Install all requirements
 reqs:
 	pip install -r requirements.txt
+	pip install -e .
 
 # Python venv setup
 venv:
@@ -26,22 +27,12 @@ venv:
 	@echo " \033[0;32msource .venv/bin/activate"
 
 # Perform base setup
-pre-setup:
-ifeq ($(minio_access_key), )
-	@echo "\033[0;31m--- You have not replaced the minio access key value."
-else ifeq ($(minio_secret_key), )
-	@echo "\033[0;31m--- You have not replaced the minio secret access key value."
-else
-	docker swarm init
-	printf "$(minio_access_key)" | docker secret create access_key -
-	printf "$(minio_secret_key)" | docker secret create secret_key -
-endif
-
 setup:
-	docker compose -f setup-compose.yml up --build --detach
+	docker swarm init
+	docker-compose -f setup-compose.yml up --detach
 
-	# Create the default buckets (raw, processed and enriched)
-	mc config host add minio http://localhost:4003 minio_admin minio_password
+setup/buckets:
+	mc config host add minio http://localhost:9000 minio_admin minio_password
 	mc mb --ignore-existing minio/raw-data
 	mc mb --ignore-existing minio/processed-data
 	mc mb --ignore-existing minio/enriched-data
